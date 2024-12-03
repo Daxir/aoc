@@ -18,27 +18,18 @@ func main() {
 
 	solution := solution{reports: reports}
 
-	validCount, err := solution.solve(isValid)
-	if err != nil {
-		fmt.Printf("error calculating part one: %v", err)
-		return
-	}
+	validCount := solution.solve(isValid)
 
 	fmt.Printf("(Part one) valid count: %v\n", validCount)
 
-
-	validCount, err = solution.solve(isValidWithTolerance)
-	if err != nil {
-		fmt.Printf("error calculating part two: %v", err)
-		return
-	}
+	validCount = solution.solve(isValidWithTolerance)
 	fmt.Printf("(Part two) valid count: %v\n", validCount)
 }
 
 func readInput() (reports [][]int, err error) {
 	file, err := os.Open("./input.txt")
 	if err != nil {
-		return nil, fmt.Errorf("error opening file: %v", err)
+		return nil, fmt.Errorf("error opening file: %w", err)
 	}
 	defer file.Close()
 
@@ -52,7 +43,7 @@ func readInput() (reports [][]int, err error) {
 		for _, s := range split {
 			value, err := strconv.Atoi(s)
 			if err != nil {
-				return nil, fmt.Errorf("error converting to int: %v", err)
+				return nil, fmt.Errorf("error converting to int: %w", err)
 			}
 			report = append(report, value)
 		}
@@ -60,7 +51,7 @@ func readInput() (reports [][]int, err error) {
 	}
 
 	if err := scanner.Err(); err != nil {
-		return nil, fmt.Errorf("error scanning file: %v", err)
+		return nil, fmt.Errorf("error scanning file: %w", err)
 	}
 
 	return reports, nil
@@ -70,14 +61,14 @@ type solution struct {
 	reports [][]int
 }
 
-func (p solution) solve(isValidFunc func([]int) bool) (int, error) {
+func (p solution) solve(isValidFunc func([]int) bool) int {
 	counter := 0
 	for _, report := range p.reports {
 		if isValidFunc(report) {
 			counter++
 		}
 	}
-	return counter, nil
+	return counter
 }
 
 func isValid(report []int) bool {
@@ -87,8 +78,8 @@ func isValid(report []int) bool {
 		return false
 	}
 
-	for i := 0; i < len(report) - 1; i++ {
-		increase := report[i] - report[i + 1]
+	for i := 0; i < len(report)-1; i++ {
+		increase := report[i] - report[i+1]
 		if !slices.Contains(safeIncreases, increase) {
 			return false
 		}
@@ -103,7 +94,7 @@ func isDecreasingOrIncreasing(report []int) bool {
 	return isAscending || isDescending
 }
 
-// a terrible brute force solution, I'm not proud of it
+// a terrible brute force solution, I'm not proud of it.
 func isValidWithTolerance(report []int) bool {
 	if isValid(report) {
 		return true

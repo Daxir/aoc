@@ -57,7 +57,7 @@ func main() {
 func readInput() ([]string, error) {
 	file, err := os.ReadFile("./input.txt")
 	if err != nil {
-		return nil, fmt.Errorf("error reading file: %v", err)
+		return nil, fmt.Errorf("error reading file: %w", err)
 	}
 	re := regexp.MustCompile(`(mul\(\d{1,3},\d{1,3}\))|(do\(\))|(don't\(\))`)
 	matches := re.FindAllString(string(file), -1)
@@ -68,20 +68,20 @@ func readInput() ([]string, error) {
 type instruction string
 
 var (
-	mul instruction = "mul"
-	do instruction = "do"
+	mul  instruction = "mul"
+	do   instruction = "do"
 	dont instruction = "don't"
 )
 
 type instructionOutput struct {
 	instruction instruction
-	value			 int
+	value       int
 }
 
 func executeInstruction(instruction string) (instructionOutput, error) {
 	instructionRegex := regexp.MustCompile(`[a-z']+`)
 	instructionName := instructionRegex.FindString(instruction)
-	
+
 	switch instructionName {
 	case "mul":
 		argumentRegex := regexp.MustCompile(`\d{1,3}`)
@@ -92,11 +92,11 @@ func executeInstruction(instruction string) (instructionOutput, error) {
 
 		left, err := strconv.Atoi(arguments[0])
 		if err != nil {
-			return instructionOutput{}, fmt.Errorf("error converting to int: %v", err)
+			return instructionOutput{}, fmt.Errorf("error converting to int: %w", err)
 		}
 		right, err := strconv.Atoi(arguments[1])
 		if err != nil {
-			return instructionOutput{}, fmt.Errorf("error converting to int: %v", err)
+			return instructionOutput{}, fmt.Errorf("error converting to int: %w", err)
 		}
 		return instructionOutput{instruction: mul, value: left * right}, nil
 	case "do":

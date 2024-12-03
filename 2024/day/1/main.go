@@ -23,7 +23,7 @@ func main() {
 		return
 	}
 
-	fmt.Printf("(Part one) sum of distances: %v\n", int(sum))
+	fmt.Printf("(Part one) sum of distances: %v\n", sum)
 
 	similarity := partTwo(left, right)
 	fmt.Printf("(Part two) similarity: %v\n", similarity)
@@ -32,7 +32,7 @@ func main() {
 func readInput() (left, right []int, err error) {
 	file, err := os.Open("./input.txt")
 	if err != nil {
-		return nil, nil, fmt.Errorf("error opening file: %v", err)
+		return nil, nil, fmt.Errorf("error opening file: %w", err)
 	}
 	defer file.Close()
 
@@ -46,18 +46,18 @@ func readInput() (left, right []int, err error) {
 
 		leftValue, err := strconv.Atoi(split[0])
 		if err != nil {
-			return nil, nil, fmt.Errorf("error converting to int: %v", err)
+			return nil, nil, fmt.Errorf("error converting to int: %w", err)
 		}
 		rightValue, err := strconv.Atoi(split[1])
 		if err != nil {
-			return nil, nil, fmt.Errorf("error converting to int: %v", err)
+			return nil, nil, fmt.Errorf("error converting to int: %w", err)
 		}
 		leftSlice = append(leftSlice, leftValue)
 		rightSlice = append(rightSlice, rightValue)
 	}
 
 	if err := scanner.Err(); err != nil {
-		return nil, nil, fmt.Errorf("error scanning file: %v", err)
+		return nil, nil, fmt.Errorf("error scanning file: %w", err)
 	}
 
 	return leftSlice, rightSlice, nil
