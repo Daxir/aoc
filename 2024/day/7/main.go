@@ -6,8 +6,6 @@ import (
 	"os"
 	"strconv"
 	"strings"
-
-	"github.com/mowshon/iterium"
 )
 
 func main() {
@@ -17,20 +15,10 @@ func main() {
 		return
 	}
 
-	result, err := getCalibrationResult(equations, []operator{add, mul})
-	if err != nil {
-		fmt.Printf("error getting calibration result: %v", err)
-		return
-	}
-
+	result := getCalibrationResult(equations, []operator{add, mul})
 	fmt.Printf("(Part one) Total calibration result: %d\n", result)
 
-	result, err = getCalibrationResult(equations, []operator{add, mul, concat})
-	if err != nil {
-		fmt.Printf("error getting calibration result: %v", err)
-		return
-	}
-
+	result = getCalibrationResult(equations, []operator{add, mul, concat})
 	fmt.Printf("(Part two) Total calibration result: %d\n", result)
 }
 
@@ -100,51 +88,34 @@ func apply(a int, op operator, b int) int {
 	panic("unknown operator")
 }
 
-func getPossibleOperators(eq equation, operators []operator) ([][]operator, error) {
-	product := iterium.Product(operators, len(eq.numbers)-1)
-	possibleOperators, err := product.Slice()
-	if err != nil {
-		return nil, fmt.Errorf("error getting possible operators: %w", err)
+func isEquationPossible(eq equation, operators []operator) bool {
+	if len(eq.numbers) == 1 {
+		return eq.numbers[0] == eq.result
 	}
 
-	return possibleOperators, nil
-}
-
-func isEquationPossible(eq equation, operators []operator) (bool, error) {
-	possibleOperators, err := getPossibleOperators(eq, operators)
-	if err != nil {
-		return false, fmt.Errorf("error getting possible operators: %w", err)
-	}
-
-	for _, operators := range possibleOperators {
-		result := eq.numbers[0]
-		for i, operator := range operators {
-			if i+1 >= len(eq.numbers) {
-				break
-			}
-
-			result = apply(result, operator, eq.numbers[i+1])
-		}
-		if result == eq.result {
-			return true, nil
+	for _, operator := range operators {
+		operationResult := apply(eq.numbers[0], operator, eq.numbers[1])
+		newNumbers := make([]int, len(eq.numbers)-1)
+		newNumbers[0] = operationResult
+		copy(newNumbers[1:], eq.numbers[2:])
+		if isEquationPossible(equation{
+			result:  eq.result,
+			numbers: newNumbers,
+		}, operators) {
+			return true
 		}
 	}
 
-	return false, nil
+	return false
 }
 
-func getCalibrationResult(equations []equation, operators []operator) (int, error) {
+func getCalibrationResult(equations []equation, operators []operator) int {
 	result := 0
 	for _, eq := range equations {
-		possible, err := isEquationPossible(eq, operators)
-		if err != nil {
-			return 0, fmt.Errorf("error checking if equation is possible: %w", err)
-		}
-
-		if possible {
+		if isEquationPossible(eq, operators) {
 			result += eq.result
 		}
 	}
 
-	return result, nil
+	return result
 }
